@@ -1,5 +1,6 @@
 /*
 FUNCTION ScrapeApartmentRentals
+TRY
     // Step 1: FETCH HTML DOCUMENT
     SEND GET request to the apartment listings page URL
     RECEIVE HTML response
@@ -35,5 +36,7 @@ FUNCTION ScrapeApartmentRentals
     // Step 5: RETURN OBJ
     RETURN the object/array containing all extracted listings
 END FUNCTION
+CATCH
+    THROW ERROR
 */
 
