@@ -1,3 +1,48 @@
+import fetch from "node-fetch";
+const {Readable} = require('stream')
+
+async function scrape(url) {
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Connection': 'keep-alive'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const html = await response.text();  // Get the HTML content as a string
+          // Extract the text between <body> tags using a DOMParser
+          const bodyContent = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i); // Regex to capture body content
+
+          if (bodyContent && bodyContent[1]) {
+              const textContent = bodyContent[1]
+                  .replace(/<[^>]*>/g, '') // Remove all HTML tags
+                  .trim(); // Trim whitespace
+              return Readable.from(textContent);
+          }
+  
+          return Readable.from('No <body> content found.');
+    } catch (error) {
+        throw error
+    }
+     
+}
+
+async function stream(input){
+    return await new Promise((resolve, reject) => {
+        let data = "";
+        input.on("data", (chunk) => data += chunk.toString());
+        input.on("end", () => resolve(data));
+        input.on("error", (err) => reject(err));
+    });
+}
+
 /*
 FUNCTION ScrapeApartmentRentals
 TRY
@@ -40,3 +85,7 @@ CATCH
     THROW ERROR
 */
 
+module.exports = {
+scrape,
+stream
+}
